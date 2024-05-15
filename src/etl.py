@@ -21,54 +21,49 @@ def extract_data(api_url, per_page=50):
 
 
 # Function to create the required tables in the PostgreSQL database
-def create_tables(conn):
-    with conn.cursor() as cursor:
-        # Create country table if it doesn't exist
-        cursor.execute('''CREATE TABLE IF NOT EXISTS country (
-                            id SERIAL PRIMARY KEY,
-                            name TEXT UNIQUE,
-                            iso3_code TEXT UNIQUE
-                          )''')
+def create_tables(cursor):
+    # Create country table if it doesn't exist
+    cursor.execute('''CREATE TABLE IF NOT EXISTS country (
+                        id SERIAL PRIMARY KEY,
+                        name TEXT UNIQUE,
+                        iso3_code TEXT UNIQUE
+                        )''')
 
-        # Create gdp table if it doesn't exist
-        cursor.execute('''CREATE TABLE IF NOT EXISTS gdp (
-                            id SERIAL PRIMARY KEY,
-                            country_id INTEGER,
-                            year INTEGER,
-                            value REAL,
-                            FOREIGN KEY (country_id) REFERENCES country(id)
-                          )''')
+    # Create gdp table if it doesn't exist
+    cursor.execute('''CREATE TABLE IF NOT EXISTS gdp (
+                        id SERIAL PRIMARY KEY,
+                        country_id INTEGER,
+                        year INTEGER,
+                        value REAL,
+                        FOREIGN KEY (country_id) REFERENCES country(id)
+                        )''')
 
 
 # Function to preload country data into the PostgreSQL database
-def preload_country_data(conn, data):
-    with conn.cursor() as cursor:
-        # Prepare data for insertion
-        country_data = set((entry['country']['value'], entry['countryiso3code']) for entry in data)
-
-        # Insert data into country table
-        cursor.executemany("INSERT INTO country (name, iso3_code) VALUES (%s, %s) ON CONFLICT DO NOTHING", country_data)
+def preload_country_data(cursor, data):
+    country_data = set((entry['country']['value'], entry['countryiso3code']) for entry in data)
+    cursor.executemany("INSERT INTO country (name, iso3_code) VALUES (%s, %s) ON CONFLICT DO NOTHING", country_data)
 
 
 # Function to load data into the PostgreSQL database
-def load_data(conn, data):
-    with conn.cursor() as cursor:
-        # Retrieve country IDs and ISO3 codes
-        cursor.execute("SELECT id, iso3_code FROM country")
-        country_mapping = {iso3_code: country_id for country_id, iso3_code in cursor.fetchall()}
+def load_data(cursor, data):
+    # Retrieve country IDs and ISO3 codes
+    cursor.execute("SELECT id, iso3_code FROM country")
+    country_mapping = {iso3_code: country_id for country_id, iso3_code in cursor.fetchall()}
+    print(country_mapping)
 
-        # Prepare and insert data into gdp table
-        for entry in data:
-            country_iso3_code = entry['countryiso3code']
-            country_id = country_mapping.get(country_iso3_code)
-            if country_id is not None:
-                year = int(entry['date'])
-                value = float(entry['value']) if entry['value'] else None
-                if value is None:
-                    value = 0  # Replace missing value with zero
-                cursor.execute("INSERT INTO gdp (country_id, year, value) VALUES (%s, %s, %s)", (country_id, year, value))
-            else:
-                raise MissingCountryIDError(f"Country ID not found for ISO3 code: {country_iso3_code}")
+    # Prepare and insert data into gdp table
+    for entry in data:
+        country_iso3_code = entry['countryiso3code']
+        country_id = country_mapping.get(country_iso3_code)
+        if country_id is not None:
+            year = int(entry['date'])
+            value = float(entry['value']) if entry['value'] else None
+            if value is None:
+                value = 0  # Replace missing value with zero
+            cursor.execute("INSERT INTO gdp (country_id, year, value) VALUES (%s, %s, %s)", (country_id, year, value))
+        else:
+            raise MissingCountryIDError(f"Country ID not found for ISO3 code: {country_iso3_code}")
 
 
 # Main function to orchestrate ETL process
@@ -91,12 +86,16 @@ def main():
     # Load data into database
     conn = psycopg2.connect(**db_params)
     with conn:
-        create_tables(conn)
-        preload_country_data(conn, data)
-        load_data(conn, data)
+        with conn.cursor() as cursor:
+            cursor.execute("DROP TABLE IF EXISTS gdp CASCADE") # REMOVER ANTES DE ENTREGAR EL CODIGO
+            create_tables(cursor)
+            preload_country_data(cursor, data)
+            load_data(cursor, data)
 
     conn.close()
 
 
 if __name__ == "__main__":
     main()
+
+    
