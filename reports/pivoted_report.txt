@@ -1,0 +1,14 @@
+| ID    | Name            | ISO3 Code  | 2019     | 2020     | 2021     | 2022     | 2023     |
+-----------------------------------------------------------------------------------------------
+| 1     | Colombia        | COL        | 323.03   | 270.15   | 318.51   | 343.62   | No data  |
+| 2     | Argentina       | ARG        | 447.75   | 385.74   | 487.9    | 631.13   | No data  |
+| 3     | Suriname        | SUR        | 4.02     | 2.91     | 3.08     | 3.62     | No data  |
+| 4     | Ecuador         | ECU        | 108.11   | 99.29    | 106.17   | 115.05   | No data  |
+| 5     | Guyana          | GUY        | 5.17     | 5.47     | 8.04     | 14.72    | No data  |
+| 6     | Chile           | CHL        | 278.6    | 254.26   | 316.58   | 301.02   | No data  |
+| 7     | Brazil          | BRA        | 1873.29  | 1476.11  | 1649.62  | 1920.1   | No data  |
+| 8     | Uruguay         | URY        | 62.05    | 53.67    | 61.41    | 71.18    | No data  |
+| 9     | Bolivia         | BOL        | 40.9     | 36.63    | 40.41    | 44.01    | No data  |
+| 10    | Venezuela, RB   | VEN        | No data  | No data  | No data  | No data  | No data  |
+| 11    | Peru            | PER        | 228.33   | 201.95   | 223.72   | 242.63   | No data  |
+| 12    | Paraguay        | PRY        | 37.93    | 35.43    | 39.95    | 41.72    | No data  |

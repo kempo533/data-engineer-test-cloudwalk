@@ -13,5 +13,5 @@ COPY . /app
 # Install project dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Run the Python application
-CMD ["python", "main.py"]
+# Run the Python application only if all tests are successful
+CMD ["sh", "-c", "pytest src/tests/test_etl.py && python main.py"]

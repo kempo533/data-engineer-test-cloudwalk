@@ -5,9 +5,9 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -17,16 +17,15 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    restart: on-failure
     depends_on:
       - postgres
     environment:
       DB_HOST: postgres
-      DB_NAME: postgres
-      DB_USER: postgres
-      DB_PASSWORD: password
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - .:/app
+      - ./reports:/app/reports
 
 volumes:
   postgres_data:
